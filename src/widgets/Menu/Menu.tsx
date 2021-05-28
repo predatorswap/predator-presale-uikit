@@ -39,7 +39,7 @@ const BodyWrapper = styled.div`
   display: flex;
 `;
 
-const Inner = styled.div<{ isPushed: boolean; showMenu: boolean }>`
+const Inner = styled.div<{ isPushed: boolean; showMenu: boolean; hideSidebar: boolean; }>`
   flex-grow: 1;
   background-image: url(/images/main-bg.png);
   background-repeat: no-repeat;
@@ -50,8 +50,8 @@ const Inner = styled.div<{ isPushed: boolean; showMenu: boolean }>`
   max-width: 100%;
 
   ${({ theme }) => theme.mediaQueries.nav} {
-    margin-left: ${({ isPushed }) => `${isPushed ? SIDEBAR_WIDTH_FULL : SIDEBAR_WIDTH_REDUCED}px`};
-    max-width: ${({ isPushed }) => `calc(100% - ${isPushed ? SIDEBAR_WIDTH_FULL : SIDEBAR_WIDTH_REDUCED}px)`};
+    margin-left: ${({ isPushed, hideSidebar }) => `${hideSidebar ? 0 : isPushed ? SIDEBAR_WIDTH_FULL : SIDEBAR_WIDTH_REDUCED}px`};
+    max-width: ${({ isPushed, hideSidebar }) => `calc(100% - ${hideSidebar ? 0 : isPushed ? SIDEBAR_WIDTH_FULL : SIDEBAR_WIDTH_REDUCED}px)`};
   }
 `;
 
@@ -66,6 +66,7 @@ const MobileOnlyOverlay = styled(Overlay)`
 
 const Menu: React.FC<NavProps> = ({
   account,
+  hideSidebar,
   login,
   logout,
   isDark,
@@ -121,6 +122,7 @@ const Menu: React.FC<NavProps> = ({
       <StyledNav showMenu={showMenu}>
         <Logo
           isPushed={isPushed}
+          hideSidebar={hideSidebar}
           togglePush={() => setIsPushed((prevState: boolean) => !prevState)}
           isDark={isDark}
           href={homeLink?.href ?? "/"}
@@ -131,7 +133,7 @@ const Menu: React.FC<NavProps> = ({
         </Flex>
       </StyledNav>
       <BodyWrapper>
-        <Panel
+        {!hideSidebar && <Panel
           isPushed={isPushed}
           isMobile={isMobile}
           showMenu={showMenu}
@@ -143,8 +145,8 @@ const Menu: React.FC<NavProps> = ({
           cakePriceUsd={cakePriceUsd}
           pushNav={setIsPushed}
           links={links}
-        />
-        <Inner isPushed={isPushed} showMenu={showMenu}>
+        />}
+        <Inner isPushed={isPushed} showMenu={showMenu} hideSidebar={hideSidebar || false}>
           {children}
         </Inner>
         <MobileOnlyOverlay show={isPushed} onClick={() => setIsPushed(false)} role="presentation" />
